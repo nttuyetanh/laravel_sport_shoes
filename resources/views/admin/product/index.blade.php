@@ -23,13 +23,32 @@
                     <div class="col-6">
                         <form method="POST" action="{{route('product.search_product')}}">
                             <div class="input-group">
-                                <input type="text" name="search_key" class="form-control" placeholder="Search for...">
+                                <input type="text" id="search_key" name="search_key" class="form-control" placeholder="Search for...">
                                 <span class="input-group-btn">
                                 <button type="submit" class="btn btn-primary ml-1" type="button">Search</button>
                                 </span>
+                               
                             </div>
                             @csrf
-                        </form>    
+                        </form>  
+                        <div class="autocomplete" style="position:absolute; z-index: 10000;width: 400px;background-color: white">
+                            <ul style="display: block;">
+                                <!-- <li style="display:block;" class="mt-3">
+                                    <img height="50" width="50" class="float-left mr-3" src="http://127.0.0.1:8000/Uploads/product-details-226.jpg" alt="">
+                                    <span >
+                                        <a class="">Hello ca nha yeu</a><br>
+                                        <span class="info_search_item">2022-09-21 22:23:40</span>
+                                    </span>
+                                </li>
+                                <li style="display:block;" class="mt-3">
+                                    <img height="50" width="50" class="float-left mr-3" src="http://127.0.0.1:8000/Uploads/product-details-226.jpg" alt="">
+                                    <span >
+                                        <a class="">Hello ca nha yeu</a><br>
+                                        <span class="info_search_item">2022-09-21 22:23:40</span>
+                                    </span>
+                                </li> -->
+                            </ul>
+                        </div>  
                     </div>
                     <div class="col-3">
                         <ul class="nav navbar-right panel_toolbox">

@@ -183,6 +183,8 @@ Route::prefix('admin')->middleware('auth_admin')->group(function(){
     Route::prefix('/thong-bao')->group(function(){
         Route::get('/change-status',[AdminController::class,'news_change_status'])->name('news.change_status');
     });
+
+    route::get('/search-san-pham-ajax-admin',[AdminController::class,'search_ajax_admin'])->name('admin.search_ajax_admin');
     
 });
 

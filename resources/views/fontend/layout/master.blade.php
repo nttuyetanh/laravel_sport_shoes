@@ -125,10 +125,10 @@
                     <div class="col-lg-3">
                         <div class="header__cart">
                             <ul>
-                                <li><a href="{{route('home.get_wish_list')}}"><i class="fa fa-heart"></i> <span>{{isset($count_wish_list)?$count_wish_list:0}}</span></a></li>
+                                <li><a href="{{route('home.get_wish_list')}}"><i class="fa fa-heart"></i> <span id=qty_wish_list>{{isset($count_wish_list)?$count_wish_list:0}}</span></a></li>
                                 <li><a href="{{route('cart.show_cart')}}"><i class="fa fa-shopping-bag"></i> <span id="qty_cart">{{Cart::count()}}</span></a></li>
                             </ul>
-                            <div class="header__cart__price">item: <span class="cart_total_price">${{Cart::total()}}</span></div>
+                            <div class="header__cart__price">item: <span class="cart_total_price">{{Cart::total()}}vnđ</span></div>
                         </div>
                     </div>
                 </div>
@@ -377,7 +377,8 @@
                         data: {wish_list_id:wish_list_id},
                         success: function(data){
                             data = JSON.parse(data);
-                            $('.row_wish_list'+data).remove();
+                            $('.row_wish_list'+data.id_product).remove();
+                            $('#qty_wish_list').html(data.quantity_product_wish_list)
                         }
                     });
                 });

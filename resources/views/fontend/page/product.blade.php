@@ -92,8 +92,16 @@
                     </div>
                     </div>
 
+                    <form method="POST" action="{{route('home.wish_list')}}">
+                                        <input type="hidden" name="product_id" value="{{$product_slug->id}}">
+                                        <button type="submit" style="border:none;background-color: transparent">
+                                            <!-- <a href="javascript:void(0);"><i class="fa fa-heart"></i></a> -->
+                                        <a href="javascript:void(0);" class="heart-icon"><span class="icon_heart_alt"></span></a>
 
-                    <a href="#" class="heart-icon"><span class="icon_heart_alt"></span></a>
+                                        </button>
+                                        @csrf
+                                    </form>
+                    <!-- <a href="#" class="heart-icon"><span class="icon_heart_alt"></span></a> -->
                     <ul>
                         <li><b>Availability</b> <span><?php echo ($product_slug->warehouse->import_quantity - $product_slug->export_quantity)>0 ? "In Stock" : "Out In Stock" ?></span></li>
                         <li><b>Quanlity</b> <span> {{ ($product_slug->warehouse->import_quantity - $product_slug->export_quantity)}}</span></li>

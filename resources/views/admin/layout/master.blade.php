@@ -578,6 +578,24 @@
                     }
                 });
             });
+
+            $('#search_key').keyup(function(){
+                    const key = $(this).val();
+                    if(key!=''){
+                        $.get({
+                        url:"{{route('admin.search_ajax_admin')}}",
+                        data:{key:key},
+                        success: function(data){
+                            $('.autocomplete').show();
+                            $('.autocomplete').html(data);
+                            // alert(data);
+                        }
+                    });
+                    }else{
+                        $('.autocomplete').hide();
+                    }
+                    // alert("helloc ca nha yeu");
+                });
             
         })
 

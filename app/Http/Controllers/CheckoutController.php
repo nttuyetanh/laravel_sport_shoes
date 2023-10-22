@@ -220,6 +220,7 @@ class CheckoutController extends Controller
         // Insert tbl_order_detail
 
         $carts = Cart::content();
+        Cart::destroy();
         $total = 0;
         $quantity_of_cart = 0;
 
@@ -244,6 +245,7 @@ class CheckoutController extends Controller
             $warehouse_item->save();
 
         }
+        // $cart = [];
 
         //add Statistic
         $order_date =  Carbon::now()->toDateString();    
@@ -274,24 +276,26 @@ class CheckoutController extends Controller
         //Gui mail 
         $name = 'Chúc mừng bạn đã đặt hàng thành công';
         $user = User::find($order->user_id);
-
+        // Cart::destroy();
+        // return json_encode(Cart::content());
 
         Mail::send('emails.order',compact('name'),function($email) use ($user) {
             $email->subject("Xác nhận đơn hàng");
             $email->to($user->email,$user->user_name);
         });
-        Cart::destroy();
-        $total =  $total * 100;
+       
+        $total =  $total;
         if(isset($request->method_payment) && $request->method_payment=='vnpay'){
+            
             $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-            $vnp_Returnurl = "http://127.0.0.1:8001/checkout/lich-su-mua-hang";
-            $vnp_TmnCode = "URHY337Q";//Mã website tại VNPAY 
-            $vnp_HashSecret = "ZWJHOFQYTBYRPFLFZXIPCGSYPKINECAE"; //Chuỗi bí mật
+            $vnp_Returnurl = "http://127.0.0.1:8000/checkout/lich-su-mua-hang";
+            $vnp_TmnCode = "6NAJWGAF";//Mã website tại VNPAY 
+            $vnp_HashSecret = "AUJHLJDASCAOFCGVTKRQCJJAASBUMMTK"; //Chuỗi bí mật
     
             $vnp_TxnRef = $order->id;; //Mã đơn hàng. Trong thực tế Merchant cần insert đơn hàng vào DB và gửi mã này sang VNPAY
             $vnp_OrderInfo = 'Thanh toan demo';
             $vnp_OrderType = 'billpayment';
-            $vnp_Amount = $total;
+            $vnp_Amount = $total *100;
             $vnp_Locale = 'vn';
             $vnp_BankCode = 'NCB';
             $vnp_IpAddr = $_SERVER['REMOTE_ADDR'];
@@ -428,7 +432,7 @@ class CheckoutController extends Controller
         $news->created_at =  Carbon::now();
         $news->save();
        
-       
+        
         return redirect()->route('checkout.lich_su_mua_hang')->with('order_success','Đặt hàng thành công, Vui lòng kiểm tra lại Email!');
 
         // echo "hello";

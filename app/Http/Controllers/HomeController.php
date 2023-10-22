@@ -291,11 +291,15 @@ class HomeController extends Controller
     }
 
     public function edit_user_info(Request $request){
-        // echo json_encode($request->input());
-        // die();
+       
         $user_id = Auth::id();
         $user = User_Info::where('user_id',$user_id)->first();
-       
+        $user_account = User::where('id',$user_id)->first();
+        $user_account->name = $request->name;
+        $user_account->email = $request->email;
+        $user_account->save();
+        
+        $user->name = $request->name;
         $user->full_name = $request->full_name;
         $user->phone = $request->phone;
         $user->country = $request->country;
@@ -322,12 +326,12 @@ class HomeController extends Controller
             // echo $new_name;
         }
 
-        // echo json_encode($user);
-        // die();
+   
        
         
         
         $user->save();
+        
 
         return redirect()->back()->with('message_success','Cập nhật thông cá nhân tin thành công');
     }
@@ -378,19 +382,26 @@ class HomeController extends Controller
     public function delete_wish_list(){
         $wish_list_id = $_GET['wish_list_id'];
         Wish_List::find($wish_list_id)->delete();
-        echo $wish_list_id;
+        $quantity_product_wish_list = Wish_List::where('user_id',Auth::user()->id)->count();
+        // echo $wish_list_id;
+        // echo $quantity_product_wish_list;
+        $data= [];
+        $data['id_product'] = $wish_list_id;
+        $data['quantity_product_wish_list'] = $quantity_product_wish_list;
+        return json_encode($data);
     }
 
     public function search_ajax(Request $request){
         $key = $request->key;
         $list_product = Product::where('status',1)->where('name','LIKE',"%{$key}%")->take(10)->get();
+        // return json_encode($list_product[0]->image);
         $html = '<ul style="display: block;">';
         foreach($list_product as $product){
-            // $html.='<li><a href="http://127.0.0.1:8001/san-pham/'.$product->slug.'">'.$product->name.'</a></li>';
+            // $html.='<li><a href="http://127.0.0.1:8000/san-pham/'.$product->slug.'">'.$product->name.'</a></li>';
             $html.='<li style="display:block;" class="mt-3">
-                    <a href="http://127.0.0.1:8001/san-pham/'.$product->slug.'"><img height="50" width="50" class="float-left mr-3" src="http://127.0.0.1:8001/Uploads/'.$product->image.'" alt=""></a>
+                    <a href="http://127.0.0.1:8000/san-pham/'.$product->slug.'"><img height="50" width="50" class="float-left mr-3" src="http://127.0.0.1:8000/Uploads/'.$product->image.'" alt=""></a>
                     <span >
-                        <a href="http://127.0.0.1:8001/san-pham/'.$product->slug.'" class="">'.$product->name.'</a><br>
+                        <a href="http://127.0.0.1:8000/san-pham/'.$product->slug.'" class="">'.$product->name.'</a><br>
                         <span class="info_search_item">'.$product->created_at.'</span>
                     </span>
                 </li>';
@@ -416,12 +427,12 @@ class HomeController extends Controller
         $products = Product::where('status',1)->where('name','LIKE',"%{$key}%")->with('warehouse')->paginate(9);
         $categories = Category::where('status',1)->get();
         $product_sales = Product::with('comment','warehouse')->where('price_promotion','>',0)->get();
-        $product_laster =  Product::where('status',1)->orderBy('updated_at','DESC')->simplePaginate(3);
         $blogs =  Blog::get();
         $count_wish_list = 0;
         if(Auth::id()){
             $count_wish_list = Wish_List::where('user_id',Auth::user()->id)->count();
         }
+        // return json_encode($products);
         return view('fontend.page.all_product',compact('categories','products','blogs','product_sales','search_key','count_wish_list'));
     }
 
@@ -436,13 +447,12 @@ class HomeController extends Controller
              Auth::user()->avatar = $user_info->avatar;
          }
         $min_string = $request->minamount;
-        $min_array = explode('$',$min_string);
-        $min = $min_array[1];
+        $min_array = explode('đ',$min_string);
+        $min = $min_array[0];
 
         $max_string = $request->maxamount;
-        $max_array = explode('$',$max_string);
-        $max = $max_array[1];
-
+        $max_array = explode('đ',$max_string);
+        $max = $max_array[0];
         $products = Product::where('status',1)->whereBetween('price_unit',[$min,$max])->with('warehouse')->paginate(9);
         $filter_page=1;
         $categories = Category::where('status',1)->get();
@@ -468,13 +478,12 @@ class HomeController extends Controller
          }
         $slug = $request->cat_slug;
         $min_string = $request->minamount;
-        $min_array = explode('$',$min_string);
-        $min = $min_array[1];
+        $min_array = explode('đ',$min_string);
+        $min = $min_array[0];
 
         $max_string = $request->maxamount;
-        $max_array = explode('$',$max_string);
-        $max = $max_array[1];
-
+        $max_array = explode('đ',$max_string);
+        $max = $max_array[0];
         $categories = Category::where('status',1)->get();
         $category_slug = Category::where('slug',$slug)->first();
         $products = Product::where('status',1)->whereBetween('price_unit',[$min,$max])->where('cat_id',$category_slug->id)->with('warehouse')->orderBy('updated_at','DESC')->paginate(9);
@@ -575,9 +584,10 @@ class HomeController extends Controller
              }
              Auth::user()->avatar = $user_info->avatar;
          }
+
         $categories = Category::where('status',1)->get();
         $category_slug = Category::where('slug',$slug)->first();
-        $products = Product::where('status',1)->where('cat_id',$category_slug->id)->orderBy('price_unit','DESC')-orderBy('updated_at','DESC')->paginate(9);
+        $products = Product::where('status',1)->where('cat_id',$category_slug->id)->orderBy('price_unit','DESC')->orderBy('updated_at','DESC')->paginate(9);
         
         $product_sales = Product::with('comment')->where('price_promotion','>',0)->get();
         $product_laster =  Product::where('status',1)->orderBy('updated_at','DESC')->simplePaginate(3);

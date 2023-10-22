@@ -41,20 +41,21 @@ class CartController extends Controller
 
     public function show_cart(){
 //        return response()->json(Cart::tax());
-if(Auth::id()){
-    $user = User::find(Auth::id());
-    $user_info = User_Info::where('email', $user->email)->first();
-     if(!$user_info->user_id){
-         $user_info->user_id = Auth::id();
-         $user_info->save();
-     }
-     Auth::user()->avatar = $user_info->avatar;
- }
+    if(Auth::id()){
+        $user = User::find(Auth::id());
+        $user_info = User_Info::where('email', $user->email)->first();
+        if(!$user_info->user_id){
+            $user_info->user_id = Auth::id();
+            $user_info->save();
+        }
+        Auth::user()->avatar = $user_info->avatar;
+    }
         $carts = Cart::content();
         $categories = Category::where('status',1)->get();
         $sub_total = Cart::total();
         $count_wish_list = 0;
-        if(Auth::user()->id){
+       
+        if(Auth::user()){
             $count_wish_list = Wish_List::where('user_id',Auth::user()->id)->count();
         }
         return view('fontend.page.shoping_cart',compact('carts','categories','sub_total','count_wish_list'));
